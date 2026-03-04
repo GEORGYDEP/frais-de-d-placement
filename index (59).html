@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚗 Frais de Déplacement Domicile-Travail — Fiscalité Belge</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0f1a;
+  --card: #141828;
+  --card-hover: #1a2035;
+  --accent: #4f8cff;
+  --accent2: #7c5cfc;
+  --accent3: #ff6b6b;
+  --green: #34d399;
+  --gold: #fbbf24;
+  --text: #e2e8f0;
+  --text-dim: #8892a8;
+  --border: rgba(79,140,255,0.15);
+  --glow: rgba(79,140,255,0.25);
+  --radius: 16px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Background animated gradient */
+body::before {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(ellipse at 30% 20%, rgba(79,140,255,0.06) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 80%, rgba(124,92,252,0.05) 0%, transparent 50%),
+              radial-gradient(ellipse at 50% 50%, rgba(255,107,107,0.03) 0%, transparent 50%);
+  animation: bgShift 20s ease-in-out infinite alternate;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes bgShift {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(-3%, -3%) rotate(3deg); }
+}
+
+/* Top progress bar */
+.progress-bar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: rgba(255,255,255,0.05);
+  z-index: 1000;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--gold));
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 15px var(--glow);
+}
+
+/* Header */
+.header {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 50px 20px 30px;
+}
+
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(79,140,255,0.1);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 8px 20px;
+  font-size: 0.85rem;
+  color: var(--accent);
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+.header p {
+  color: var(--text-dim);
+  font-size: 1.05rem;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Main container */
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+}
+
+/* Step navigation dots */
+.step-nav {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.step-dot {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  transition: all 0.4s ease;
+  cursor: default;
+}
+
+.step-dot.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-color: transparent;
+  color: #fff;
+  transform: scale(1.15);
+  box-shadow: 0 0 20px var(--glow);
+}
+
+.step-dot.completed {
+  background: var(--green);
+  border-color: transparent;
+  color: #fff;
+}
+
+/* Section cards */
+.section {
+  display: none;
+  animation: fadeSlideIn 0.5s ease forwards;
+}
+
+.section.active {
+  display: block;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  opacity: 0.6;
+}
+
+.card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.card h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 20px 0 10px;
+}
+
+.card p, .card li {
+  color: var(--text);
+  line-height: 1.75;
+  font-size: 0.98rem;
+}
+
+.card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.card ul li {
+  padding: 6px 0 6px 28px;
+  position: relative;
+}
+
+.card ul li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Highlight boxes */
+.highlight-box {
+  background: rgba(79,140,255,0.08);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 12px 12px 0;
+  padding: 20px 24px;
+  margin: 20px 0;
+}
+
+.highlight-box.green {
+  background: rgba(52,211,153,0.08);
+  border-left-color: var(--green);
+}
+
+.highlight-box.red {
+  background: rgba(255,107,107,0.08);
+  border-left-color: var(--accent3);
+}
+
+.highlight-box.gold {
+  background: rgba(251,191,36,0.08);
+  border-left-color: var(--gold);
+}
+
+.highlight-box p {
+  margin: 0;
+}
+
+.highlight-box strong {
+  color: #fff;
+}
+
+/* Quiz buttons */
+.quiz-options {
+  display: grid;
+  gap: 14px;
+  margin: 24px 0;
+}
+
+.quiz-btn {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 24px;
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.quiz-btn:hover {
+  background: var(--card-hover);
+  border-color: var(--accent);
+  transform: translateX(6px);
+}
+
+.quiz-btn .letter {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(79,140,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.quiz-btn.correct {
+  border-color: var(--green);
+  background: rgba(52,211,153,0.1);
+}
+
+.quiz-btn.correct .letter {
+  background: var(--green);
+  color: #fff;
+}
+
+.quiz-btn.wrong {
+  border-color: var(--accent3);
+  background: rgba(255,107,107,0.08);
+}
+
+.quiz-btn.wrong .letter {
+  background: var(--accent3);
+  color: #fff;
+}
+
+.quiz-btn:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.quiz-btn:disabled:hover {
+  transform: none;
+}
+
+/* Feedback messages */
+.feedback {
+  display: none;
+  padding: 18px 22px;
+  border-radius: 12px;
+  margin: 16px 0;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  animation: fadeSlideIn 0.4s ease;
+}
+
+.feedback.show { display: block; }
+
+.feedback.success {
+  background: rgba(52,211,153,0.1);
+  border: 1px solid rgba(52,211,153,0.3);
+  color: var(--green);
+}
+
+.feedback.error {
+  background: rgba(255,107,107,0.1);
+  border: 1px solid rgba(255,107,107,0.3);
+  color: var(--accent3);
+}
+
+/* Visual illustration: road animation */
+.road-visual {
+  background: linear-gradient(180deg, #1a1f35, #0f1320);
+  border-radius: 16px;
+  padding: 30px;
+  margin: 24px 0;
+  position: relative;
+  overflow: hidden;
+  min-height: 180px;
+}
+
+.road {
+  position: relative;
+  height: 8px;
+  background: #2a3050;
+  border-radius: 4px;
+  margin: 30px 0;
+}
+
+.road::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, #fbbf24 0, #fbbf24 20px, transparent 20px, transparent 40px);
+  transform: translateY(-50%);
+}
+
+.road-label {
+  position: absolute;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.road-label.home {
+  left: 0;
+  top: -20px;
+  background: rgba(79,140,255,0.2);
+  color: var(--accent);
+}
+
+.road-label.work {
+  right: 0;
+  top: -20px;
+  background: rgba(124,92,252,0.2);
+  color: var(--accent2);
+}
+
+.car-icon {
+  position: absolute;
+  top: -16px;
+  font-size: 1.6rem;
+  animation: driveCar 4s ease-in-out infinite;
+}
+
+@keyframes driveCar {
+  0% { left: 12%; }
+  50% { left: 75%; }
+  100% { left: 12%; }
+}
+
+/* Comparison table visual */
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+@media (max-width: 600px) {
+  .comparison { grid-template-columns: 1fr; }
+}
+
+.comparison-card {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.comparison-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+.comparison-card.private {
+  border-color: rgba(255,107,107,0.3);
+}
+
+.comparison-card.pro {
+  border-color: rgba(52,211,153,0.3);
+}
+
+.comparison-card .icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.comparison-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
+.comparison-card p {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+/* Big number display */
+.big-number {
+  text-align: center;
+  padding: 30px;
+  margin: 20px 0;
+  background: linear-gradient(135deg, rgba(79,140,255,0.1), rgba(124,92,252,0.1));
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+
+.big-number .amount {
+  font-family: 'Playfair Display', serif;
+  font-size: 3.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--gold), #ff9f43);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.big-number .label {
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  margin-top: 6px;
+}
+
+/* Salary simulator */
+.simulator {
+  background: rgba(0,0,0,0.25);
+  border-radius: 16px;
+  padding: 28px;
+  margin: 24px 0;
+  border: 1px solid var(--border);
+}
+
+.simulator h3 {
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+
+.sim-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.sim-row:last-child { border-bottom: none; }
+
+.sim-row .sim-label {
+  font-size: 0.92rem;
+  color: var(--text-dim);
+}
+
+.sim-row .sim-value {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.sim-row .sim-value.red { color: var(--accent3); }
+.sim-row .sim-value.green { color: var(--green); }
+.sim-row .sim-value.gold { color: var(--gold); }
+.sim-row .sim-value.white { color: #fff; }
+
+.sim-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  margin: 8px 0;
+}
+
+/* Input range slider */
+.slider-group {
+  margin: 20px 0;
+}
+
+.slider-group label {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+
+.slider-group label span {
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  cursor: pointer;
+  box-shadow: 0 0 12px var(--glow);
+}
+
+/* Navigation buttons */
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.btn {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 14px 32px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(79,140,255,0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(79,140,255,0.4);
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Score display */
+.score-display {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 999;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.score-display .star { font-size: 1.3rem; }
+.score-display .score-text {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--gold);
+}
+
+/* Transport mode tags */
+.transport-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin: 4px;
+}
+
+.transport-tag.train { background: rgba(79,140,255,0.15); color: var(--accent); }
+.transport-tag.car { background: rgba(255,107,107,0.15); color: var(--accent3); }
+.transport-tag.bike { background: rgba(52,211,153,0.15); color: var(--green); }
+.transport-tag.walk { background: rgba(251,191,36,0.15); color: var(--gold); }
+
+/* CCT table */
+.cct-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 20px 0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.cct-table th {
+  background: rgba(79,140,255,0.15);
+  padding: 14px 16px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-align: left;
+}
+
+.cct-table td {
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.cct-table tr:hover td {
+  background: rgba(255,255,255,0.02);
+}
+
+/* Confetti canvas */
+#confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Animations */
+.bounce-in {
+  animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Timeline visual */
+.timeline {
+  position: relative;
+  padding-left: 32px;
+  margin: 24px 0;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--accent), var(--accent2), var(--green));
+  border-radius: 3px;
+}
+
+.timeline-item {
+  position: relative;
+  padding: 16px 0;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -26px;
+  top: 22px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid var(--bg);
+  box-shadow: 0 0 10px var(--glow);
+}
+
+.timeline-item:nth-child(2)::before { background: var(--accent2); }
+.timeline-item:nth-child(3)::before { background: var(--green); }
+
+.timeline-item h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.timeline-item p {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .card { padding: 24px; }
+  .header h1 { font-size: 1.8rem; }
+  .nav-buttons { flex-direction: column; }
+  .btn { width: 100%; justify-content: center; }
+  .score-display { top: 12px; right: 12px; padding: 8px 14px; }
+  .big-number .amount { font-size: 2.5rem; }
+}
+
+/* Tooltip */
+.tooltip {
+  position: relative;
+  display: inline;
+  border-bottom: 1px dashed var(--accent);
+  cursor: help;
+  color: var(--accent);
+}
+
+.tooltip:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  color: var(--text);
+  width: max-content;
+  max-width: 280px;
+  z-index: 100;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  line-height: 1.5;
+}
+
+/* Final result card */
+.result-card {
+  text-align: center;
+  padding: 40px;
+  background: linear-gradient(135deg, rgba(79,140,255,0.08), rgba(124,92,252,0.08), rgba(52,211,153,0.08));
+  border: 1px solid rgba(52,211,153,0.3);
+  border-radius: 20px;
+}
+
+.result-card .trophy { font-size: 4rem; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<!-- Progress bar -->
+<div class="progress-bar-container">
+  <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+</div>
+
+<!-- Score -->
+<div class="score-display">
+  <span class="star">⭐</span>
+  <span class="score-text" id="scoreText">0 pts</span>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-badge">🇧🇪 Fiscalité belge — Année de revenus 2026</div>
+  <h1>Frais de Déplacement<br>Domicile – Travail</h1>
+  <p>Découvrez comment fonctionne l'indemnisation des trajets domicile-travail en Belgique et comment optimiser le salaire net grâce à l'exonération fiscale.</p>
+</div>
+
+<!-- Step dots -->
+<div class="container">
+  <div class="step-nav" id="stepNav"></div>
+
+  <!-- ========== ÉTAPE 1 : LA QUESTION ========== -->
+  <div class="section" id="step1">
+    <div class="card">
+      <span class="card-icon">🤔</span>
+      <h2>Privé ou professionnel ?</h2>
+      <p>Chaque jour, des millions de travailleurs belges quittent leur domicile pour se rendre sur leur lieu de travail. Mais ce trajet quotidien, est-il considéré comme un déplacement <strong>privé</strong> ou <strong>professionnel</strong> ?</p>
+
+      <!-- Visual road -->
+      <div class="road-visual">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="text-align:center;">
+            <div style="font-size:2.5rem;">🏠</div>
+            <div style="font-size:0.8rem;color:var(--accent);font-weight:600;">DOMICILE</div>
+          </div>
+          <div style="font-size:1.5rem;color:var(--text-dim);">· · · · · · · · · · · · ·</div>
+          <div style="text-align:center;">
+            <div style="font-size:2.5rem;">🏢</div>
+            <div style="font-size:0.8rem;color:var(--accent2);font-weight:600;">LIEU DE TRAVAIL</div>
+          </div>
+        </div>
+        <div class="road">
+          <div class="car-icon">🚗</div>
+        </div>
+        <div style="text-align:center;margin-top:16px;">
+          <span style="font-size:0.9rem;color:var(--gold);font-weight:600;">⬆ Ce trajet est-il privé ou professionnel ? ⬆</span>
+        </div>
+      </div>
+
+      <p style="margin:16px 0;"><strong>À votre avis, comment est qualifié ce déplacement en droit fiscal belge ?</strong></p>
+
+      <div class="quiz-options" id="quiz1">
+        <button class="quiz-btn" onclick="answerQuiz1('private')">
+          <span class="letter">A</span>
+          <span>C'est un déplacement <strong>privé</strong> — c'est le choix personnel du travailleur d'habiter à une certaine distance de son travail.</span>
+        </button>
+        <button class="quiz-btn" onclick="answerQuiz1('pro')">
+          <span class="letter">B</span>
+          <span>C'est un déplacement <strong>professionnel</strong> — le travailleur se déplace pour aller travailler, donc c'est professionnel.</span>
+        </button>
+        <button class="quiz-btn" onclick="answerQuiz1('mix')">
+          <span class="letter">C</span>
+          <span>C'est un <strong>mélange des deux</strong> — une partie privée et une partie professionnelle.</span>
+        </button>
+      </div>
+
+      <div class="feedback" id="feedback1"></div>
+    </div>
+
+    <div class="nav-buttons">
+      <div></div>
+      <button class="btn btn-primary" id="nextBtn1" onclick="goToStep(2)" disabled>
+        Étape suivante →
+      </button>
+    </div>
+  </div>
+
+  <!-- ========== ÉTAPE 2 : EXPLICATION PRIVÉ vs PROFESSIONNEL ========== -->
+  <div class="section" id="step2">
+    <div class="card">
+      <span class="card-icon">⚖️</span>
+      <h2>Privé vs Professionnel : les conséquences fiscales</h2>
+
+      <p>En Belgique, le trajet entre le domicile et le lieu de travail est considéré comme un déplacement <strong>100 % privé</strong>. Pourquoi ? Parce que c'est le travailleur qui choisit son lieu de résidence. L'employeur n'a aucune prise sur cette décision.</p>
+
+      <p style="margin-top:14px;">Mais cette qualification a des <strong>conséquences fiscales importantes</strong> :</p>
+
+      <div class="comparison">
+        <div class="comparison-card private">
+          <div class="icon">🔴</div>
+          <h4>Déplacement privé</h4>
+          <p>Les frais sont <strong>à charge du travailleur</strong>. Si l'employeur verse une compensation, ce montant est considéré comme de la <strong>rémunération imposable</strong>.</p>
+          <div style="margin-top:12px;padding:10px;background:rgba(255,107,107,0.1);border-radius:8px;font-size:0.85rem;">
+            💰 Compensation = salaire → <strong>impôts à payer</strong>
+          </div>
+        </div>
+        <div class="comparison-card pro">
+          <div class="icon">🟢</div>
+          <h4>Déplacement professionnel</h4>
+          <p>Les frais sont <strong>à charge de l'employeur</strong>. Le remboursement vient en compensation de frais engagés pour l'entreprise.</p>
+          <div style="margin-top:12px;padding:10px;background:rgba(52,211,153,0.1);border-radius:8px;font-size:0.85rem;">
+            💰 Remboursement = frais propres → <strong>pas d'impôts</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="highlight-box red">
+        <p>⚠️ <strong>Attention :</strong> le trajet domicile-travail étant privé, toute indemnité versée par l'employeur constitue <em>en principe</em> de la rémunération imposable. Le travailleur devrait donc payer des impôts sur les montants reçus.</p>
+      </div>
+
+      <h3>🔍 Vérifions votre compréhension</h3>
+      <p><strong>Un employeur verse 40 €/mois à son travailleur pour ses trajets domicile-travail. Ce montant sera-t-il imposé ?</strong></p>
+
+      <div class="quiz-options" id="quiz2">
+        <button class="quiz-btn" onclick="answerQuiz2('yes')">
+          <span class="letter">A</span>
+          <span>Oui, en principe c'est de la rémunération imposable car le trajet est privé.</span>
+        </button>
+        <button class="quiz-btn" onclick="answerQuiz2('no')">
+          <span class="letter">B</span>
+          <span>Non, car l'employeur paie pour un trajet lié au travail, donc c'est exonéré.</span>
+        </button>
+      </div>
+
+      <div class="feedback" id="feedback2"></div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="goToStep(1)">← Retour</button>
+      <button class="btn btn-primary" id="nextBtn2" onclick="goToStep(3)" disabled>Étape suivante →</button>
+    </div>
+  </div>
+
+  <!-- ========== ÉTAPE 3 : L'EXONÉRATION BELGE ========== -->
+  <div class="section" id="step3">
+    <div class="card">
+      <span class="card-icon">🇧🇪</span>
+      <h2>L'exonération fiscale belge</h2>
+
+      <p>Heureusement, la Belgique a mis en place un système d'<strong>exonération fiscale</strong> pour les indemnités de déplacement domicile-travail. Même si le trajet est privé, une partie de l'indemnité peut être exonérée d'impôt !</p>
+
+      <div class="big-number bounce-in">
+        <div class="amount">500 €</div>
+        <div class="label">Exonération maximale par an — Année de revenus 2026<br><span style="font-size:0.82rem;color:var(--text-dim);">(490 € pour les revenus 2025)</span></div>
+      </div>
+
+      <p>Cette exonération s'applique aux travailleurs qui utilisent un <strong>moyen de transport privé</strong> (voiture, moto, covoiturage, marche à pied…) et qui optent pour la <strong>déduction forfaitaire</strong> de leurs frais professionnels dans leur déclaration d'impôt.</p>
+
+      <h3>📊 Exonérations par type de transport</h3>
+
+      <div style="margin:16px 0;">
+        <span class="transport-tag train">🚂 Transport en commun</span>
+        <span class="transport-tag bike">🚲 Vélo</span>
+        <span class="transport-tag car">🚗 Voiture privée</span>
+        <span class="transport-tag walk">🚶 Marche à pied</span>
+      </div>
+
+      <table class="cct-table">
+        <thead>
+          <tr>
+            <th>Moyen de transport</th>
+            <th>Exonération (revenus 2026)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🚂 Transport en commun (train, bus, tram, métro)</td>
+            <td style="color:var(--green);font-weight:700;">100 % exonéré</td>
+          </tr>
+          <tr>
+            <td>🚲 Vélo (classique, électrique, speed pedelec…)</td>
+            <td style="color:var(--green);font-weight:700;">0,37 €/km — max. 3.690 €/an</td>
+          </tr>
+          <tr>
+            <td>🚗 Voiture privée, moto, covoiturage</td>
+            <td style="color:var(--gold);font-weight:700;">Max. 500 €/an</td>
+          </tr>
+          <tr>
+            <td>🚶 Marche à pied</td>
+            <td style="color:var(--gold);font-weight:700;">Max. 500 €/an</td>
+          </tr>
+          <tr>
+            <td>🚐 Transport collectif organisé par l'employeur</td>
+            <td style="color:var(--green);font-weight:700;">100 % exonéré</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="highlight-box green">
+        <p>✅ <strong>Bonne nouvelle :</strong> Si l'employeur verse jusqu'à 500 € par an en 2026 pour le trajet domicile-travail en voiture, le travailleur ne paiera <strong>aucun impôt</strong> sur ce montant. C'est comme recevoir du <strong>salaire net directement</strong> !</p>
+      </div>
+
+      <h3>🔍 Question de compréhension</h3>
+      <p><strong>Un travailleur reçoit 45 €/mois de son employeur pour ses trajets en voiture. Sur l'année, il reçoit 540 €. Quel montant sera imposé ?</strong></p>
+
+      <div class="quiz-options" id="quiz3">
+        <button class="quiz-btn" onclick="answerQuiz3('540')">
+          <span class="letter">A</span>
+          <span>Les 540 € seront entièrement imposés.</span>
+        </button>
+        <button class="quiz-btn" onclick="answerQuiz3('40')">
+          <span class="letter">B</span>
+          <span>Seuls 40 € seront imposés (540 € - 500 € d'exonération).</span>
+        </button>
+        <button class="quiz-btn" onclick="answerQuiz3('0')">
+          <span class="letter">C</span>
+          <span>Rien ne sera imposé, le trajet domicile-travail est toujours exonéré.</span>
+        </button>
+      </div>
+
+      <div class="feedback" id="feedback3"></div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="goToStep(2)">← Retour</button>
+      <button class="btn btn-primary" id="nextBtn3" onclick="goToStep(4)" disabled>Étape suivante →</button>
+    </div>
+  </div>
+
+  <!-- ========== ÉTAPE 4 : L'AVANTAGE POUR L'EMPLOYEUR ========== -->
+  <div class="section" id="step4">
+    <div class="card">
+      <span class="card-icon">💡</span>
+      <h2>Un outil d'optimisation salariale</h2>
+
+      <p>Verser une indemnité de déplacement domicile-travail est un véritable <strong>outil d'optimisation</strong> pour l'employeur et le travailleur. Voyons pourquoi avec un exemple concret.</p>
+
+      <h3>🎯 Le problème du salaire brut</h3>
+      <p>Quand l'employeur verse du salaire <strong>brut</strong>, celui-ci est grevé de charges sociales et d'impôts. Le travailleur ne reçoit qu'une fraction en net.</p>
+
+      <div class="simulator">
+        <h3>💰 Scénario 1 : Augmentation de salaire brut de 500 €/an</h3>
+        <div class="sim-row">
+          <span class="sim-label">Montant brut versé par l'employeur</span>
+          <span class="sim-value white">500,00 €</span>
+        </div>
+        <div class="sim-row">
+          <span class="sim-label">Cotisations sociales personnelles (≈ 13,07 %)</span>
+          <span class="sim-value red">- 65,35 €</span>
+        </div>
+        <div class="sim-row">
+          <span class="sim-label">Précompte professionnel (≈ 40 % sur la tranche)</span>
+          <span class="sim-value red">- 173,86 €</span>
+        </div>
+        <div class="sim-divider"></div>
+        <div class="sim-row">
+          <span class="sim-label"><strong>Net reçu par le travailleur</strong></span>
+          <span class="sim-value gold">≈ 260,79 €</span>
+        </div>
+      </div>
+
+      <div class="simulator">
+        <h3>🎉 Scénario 2 : Indemnité de déplacement domicile-travail de 500 €/an</h3>
+        <div class="sim-row">
+          <span class="sim-label">Indemnité versée par l'employeur</span>
+          <span class="sim-value white">500,00 €</span>
+        </div>
+        <div class="sim-row">
+          <span class="sim-label">Cotisations sociales</span>
+          <span class="sim-value green">0,00 €</span>
+        </div>
+        <div class="sim-row">
+          <span class="sim-label">Précompte professionnel (exonéré jusqu'à 500 €)</span>
+          <span class="sim-value green">0,00 €</span>
+        </div>
+        <div class="sim-divider"></div>
+        <div class="sim-row">
+          <span class="sim-label"><strong>Net reçu par le travailleur</strong></span>
+          <span class="sim-value gold">500,00 €</span>
+        </div>
+      </div>
+
+      <div class="highlight-box gold">
+        <p>💰 <strong>Résultat :</strong> Pour le même coût employeur de 500 €, le travailleur reçoit <strong>500 € net</strong> via l'indemnité de déplacement contre seulement <strong>≈ 261 € net</strong> via du salaire brut. C'est presque le <strong>double</strong> en net !</p>
+      </div>
+
+      <h3>📊 Simulateur interactif</h3>
+      <p>Faites varier le montant mensuel pour voir l'impact :</p>
+
+      <div class="slider-group">
+        <label>Indemnité mensuelle de l'employeur : <span id="sliderValue">40</span> €/mois</label>
+        <input type="range" id="simSlider" min="10" max="80" value="40" step="5" oninput="updateSimulator()">
+      </div>
+
+      <div class="simulator" id="simResult">
+        <!-- Filled by JS -->
+      </div>
+
+      <h3>🔍 Question de compréhension</h3>
+      <p><strong>Pourquoi l'indemnité de déplacement est-elle un avantage pour l'employeur ?</strong></p>
+
+      <div class="quiz-options" id="quiz4">
+        <button class="quiz-btn" onclick="answerQuiz4('cost')">
+          <span class="letter">A</span>
+          <span>Parce que ça coûte moins cher à l'employeur qu'une augmentation de salaire.</span>
+        </button>
+        <button class="quiz-btn" onclick="answerQuiz4('net')">
+          <span class="letter">B</span>
+          <span>Parce que pour un même coût, le travailleur reçoit davantage en net, ce qui augmente sa satisfaction.</span>
+        </button>
+        <button class="quiz-btn" onclick="answerQuiz4('law')">
+          <span class="letter">C</span>
+          <span>Parce que l'employeur n'a pas le choix, c'est obligatoire par la loi.</span>
+        </button>
+      </div>
+
+      <div class="feedback" id="feedback4"></div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="goToStep(3)">← Retour</button>
+      <button class="btn btn-primary" id="nextBtn4" onclick="goToStep(5)" disabled>Étape suivante →</button>
+    </div>
+  </div>
+
+  <!-- ========== ÉTAPE 5 : CCT ET CONTRAT DE TRAVAIL ========== -->
+  <div class="section" id="step5">
+    <div class="card">
+      <span class="card-icon">📜</span>
+      <h2>Obligations légales : CCT et contrat de travail</h2>
+
+      <p>En Belgique, l'intervention de l'employeur dans les frais de déplacement n'est pas toujours volontaire. Plusieurs sources juridiques peuvent <strong>obliger</strong> l'employeur à intervenir :</p>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <h4>1. Les conventions collectives de travail (CCT)</h4>
+          <p>Des CCT interprofessionnelles (comme la <strong>CCT n° 19/11</strong>) et sectorielles imposent des interventions minimales, notamment pour les transports en commun. Chaque commission paritaire peut prévoir ses propres règles.</p>
+        </div>
+        <div class="timeline-item">
+          <h4>2. Les CCT sectorielles spécifiques</h4>
+          <p>Certains secteurs prévoient un remboursement kilométrique pour la voiture, un montant fixe par jour ou un pourcentage du prix de l'abonnement de train. Le montant et les conditions varient d'un secteur à l'autre.</p>
+        </div>
+        <div class="timeline-item">
+          <h4>3. Le contrat de travail individuel</h4>
+          <p>L'employeur peut s'engager contractuellement à verser une indemnité de transport. Une fois inscrit dans le contrat, ce droit devient <strong>un droit acquis</strong> du travailleur.</p>
+        </div>
+      </div>
+
+      <h3>📋 Les principales obligations par transport</h3>
+
+      <table class="cct-table">
+        <thead>
+          <tr>
+            <th>Transport</th>
+            <th>Obligation employeur</th>
+            <th>Base légale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🚂 Train</td>
+            <td>Obligatoire — intervention minimale selon barème CCT n° 19/11</td>
+            <td>CCT n° 19/11</td>
+          </tr>
+          <tr>
+            <td>🚌 Bus / Tram / Métro</td>
+            <td>Obligatoire — min. 71,8 % du prix, plafonné</td>
+            <td>CCT n° 19/11</td>
+          </tr>
+          <tr>
+            <td>🚲 Vélo</td>
+            <td>Obligatoire — min. 0,28 €/km (CCT n° 164), certains secteurs prévoient plus</td>
+            <td>CCT n° 164</td>
+          </tr>
+          <tr>
+            <td>🚗 Voiture privée</td>
+            <td>Pas d'obligation générale — dépend de la CCT sectorielle ou du contrat</td>
+            <td>Variable</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="highlight-box">
+        <p>📌 <strong>Important :</strong> Pour les déplacements <strong>professionnels</strong> (missions, visites clients…), l'indemnité kilométrique forfaitaire acceptée est de <strong>0,4326 €/km</strong> (Q1 2026) ou <strong>0,4449 €/km</strong> (barème annuel juillet 2025 – juin 2026). Attention, il ne faut pas confondre avec l'indemnité domicile-travail !</p>
+      </div>
+
+      <h3>🔍 Dernière question !</h3>
+      <p><strong>Un travailleur de la CP 200 (employés) vient en voiture. Son employeur est-il légalement obligé de lui verser une indemnité pour le trajet domicile-travail ?</strong></p>
+
+      <div class="quiz-options" id="quiz5">
+        <button class="quiz-btn" onclick="answerQuiz5('no')">
+          <span class="letter">A</span>
+          <span>Non, il n'existe pas d'obligation générale pour la voiture privée, sauf si une CCT sectorielle ou le contrat le prévoit.</span>
+        </button>
+        <button class="quiz-btn" onclick="answerQuiz5('yes')">
+          <span class="letter">B</span>
+          <span>Oui, l'employeur doit toujours rembourser les frais de déplacement, quel que soit le moyen de transport.</span>
+        </button>
+      </div>
+
+      <div class="feedback" id="feedback5"></div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="goToStep(4)">← Retour</button>
+      <button class="btn btn-primary" id="nextBtn5" onclick="goToStep(6)" disabled>Voir le résumé →</button>
+    </div>
+  </div>
+
+  <!-- ========== ÉTAPE 6 : RÉSUMÉ & CONCLUSION ========== -->
+  <div class="section" id="step6">
+    <div class="card">
+      <div class="result-card">
+        <div class="trophy">🏆</div>
+        <h2 style="margin-bottom:8px;">Félicitations !</h2>
+        <p style="color:var(--text-dim);margin-bottom:6px;">Vous avez terminé le module sur les frais de déplacement.</p>
+        <div style="margin:16px 0;">
+          <span style="font-size:2rem;font-weight:800;color:var(--gold);" id="finalScore">0</span>
+          <span style="color:var(--text-dim);"> / 50 points</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="card-icon">📝</span>
+      <h2>Ce qu'il faut retenir</h2>
+
+      <div class="highlight-box red">
+        <p>🔴 <strong>Le trajet domicile-travail est un déplacement 100 % privé.</strong> En principe, toute indemnité reçue de l'employeur est de la rémunération imposable.</p>
+      </div>
+
+      <div class="highlight-box green">
+        <p>🟢 <strong>Mais une exonération existe !</strong> Pour les revenus 2026, jusqu'à <strong>500 €/an</strong> peuvent être exonérés d'impôt pour l'utilisation d'un véhicule privé. Pour les transports en commun, l'exonération est <strong>totale</strong>.</p>
+      </div>
+
+      <div class="highlight-box gold">
+        <p>💡 <strong>C'est un outil d'optimisation salariale.</strong> L'employeur peut verser jusqu'à 500 €/an de salaire 100 % net à son travailleur via l'indemnité de déplacement, au lieu de passer par du brut lourdement taxé.</p>
+      </div>
+
+      <div class="highlight-box">
+        <p>📜 <strong>Les CCT et le contrat de travail</strong> peuvent rendre l'intervention obligatoire, en particulier pour les transports en commun (CCT n° 19/11) et le vélo (CCT n° 164). Pour la voiture, cela dépend du secteur.</p>
+      </div>
+
+      <h3>📊 Tableau récapitulatif — Revenus 2026</h3>
+      <table class="cct-table">
+        <thead>
+          <tr>
+            <th>Transport</th>
+            <th>Exonération fiscale</th>
+            <th>Obligation employeur</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🚂 Transport en commun</td>
+            <td style="color:var(--green);">100 % exonéré</td>
+            <td>Oui (CCT 19/11)</td>
+          </tr>
+          <tr>
+            <td>🚲 Vélo</td>
+            <td style="color:var(--green);">0,37 €/km — max. 3.690 €</td>
+            <td>Oui (CCT 164)</td>
+          </tr>
+          <tr>
+            <td>🚗 Voiture privée</td>
+            <td style="color:var(--gold);">Max. 500 €/an</td>
+            <td>Selon CCT sectorielle/contrat</td>
+          </tr>
+          <tr>
+            <td>🚶 Marche à pied</td>
+            <td style="color:var(--gold);">Max. 500 €/an</td>
+            <td>Non obligatoire</td>
+          </tr>
+          <tr>
+            <td>🚐 Transport collectif employeur</td>
+            <td style="color:var(--green);">100 % exonéré</td>
+            <td>Non obligatoire</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="text-align:center;margin-top:30px;padding:20px;background:rgba(79,140,255,0.05);border-radius:14px;">
+        <p style="font-size:0.85rem;color:var(--text-dim);">Sources : SPF Finances (fin.belgium.be) — Securex — UCM — Dynamik HR<br>Données mises à jour pour l'année de revenus 2026, exercice d'imposition 2027.</p>
+        <p style="font-size:0.85rem;color:var(--text-dim);margin-top:6px;">Application éducative — Institut Saint-Luc de Frameries</p>
+      </div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="goToStep(5)">← Retour</button>
+      <button class="btn btn-primary" onclick="restartApp()">🔄 Recommencer</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ====== STATE ======
+const totalSteps = 6;
+let currentStep = 1;
+let score = 0;
+const answered = {};
+
+// ====== INIT ======
+function init() {
+  buildStepNav();
+  goToStep(1);
+  updateSimulator();
+}
+
+function buildStepNav() {
+  const nav = document.getElementById('stepNav');
+  const labels = ['❓','⚖️','🇧🇪','💡','📜','🏆'];
+  nav.innerHTML = '';
+  for (let i = 1; i <= totalSteps; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'step-dot';
+    dot.id = `dot${i}`;
+    dot.textContent = labels[i-1];
+    nav.appendChild(dot);
+  }
+}
+
+function goToStep(step) {
+  currentStep = step;
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(`step${step}`).classList.add('active');
+
+  // Update dots
+  for (let i = 1; i <= totalSteps; i++) {
+    const dot = document.getElementById(`dot${i}`);
+    dot.classList.remove('active', 'completed');
+    if (i === step) dot.classList.add('active');
+    else if (i < step) dot.classList.add('completed');
+  }
+
+  // Progress bar
+  const pct = ((step - 1) / (totalSteps - 1)) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (step === 6) {
+    document.getElementById('finalScore').textContent = score;
+    launchConfetti();
+  }
+}
+
+// ====== SCORING ======
+function addScore(pts) {
+  score += pts;
+  document.getElementById('scoreText').textContent = score + ' pts';
+}
+
+// ====== QUIZ 1 ======
+function answerQuiz1(answer) {
+  if (answered.q1) return;
+  answered.q1 = true;
+
+  const btns = document.querySelectorAll('#quiz1 .quiz-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('feedback1');
+  if (answer === 'private') {
+    btns[0].classList.add('correct');
+    fb.className = 'feedback show success';
+    fb.innerHTML = '✅ <strong>Correct !</strong> Le trajet domicile-travail est bien considéré comme un déplacement <strong>privé</strong> en droit fiscal belge. C\'est le travailleur qui choisit où il habite, donc les frais de ce trajet sont à sa charge.';
+    addScore(10);
+  } else {
+    if (answer === 'pro') btns[1].classList.add('wrong');
+    else btns[2].classList.add('wrong');
+    btns[0].classList.add('correct');
+    fb.className = 'feedback show error';
+    fb.innerHTML = '❌ <strong>Pas tout à fait.</strong> En Belgique, le trajet domicile-travail est considéré comme un déplacement <strong>privé</strong>. Le travailleur choisit son lieu de résidence, et ce choix est considéré comme personnel. La bonne réponse était A.';
+  }
+  document.getElementById('nextBtn1').disabled = false;
+}
+
+// ====== QUIZ 2 ======
+function answerQuiz2(answer) {
+  if (answered.q2) return;
+  answered.q2 = true;
+
+  const btns = document.querySelectorAll('#quiz2 .quiz-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('feedback2');
+  if (answer === 'yes') {
+    btns[0].classList.add('correct');
+    fb.className = 'feedback show success';
+    fb.innerHTML = '✅ <strong>Exact !</strong> En principe, cette indemnité est de la rémunération imposable puisque le trajet est privé. Mais nous allons voir qu\'une exonération existe en Belgique !';
+    addScore(10);
+  } else {
+    btns[1].classList.add('wrong');
+    btns[0].classList.add('correct');
+    fb.className = 'feedback show error';
+    fb.innerHTML = '❌ <strong>Attention !</strong> Même si le trajet est lié au travail, il reste juridiquement un déplacement <strong>privé</strong>. Donc en principe, l\'indemnité est imposable. La bonne réponse était A.';
+  }
+  document.getElementById('nextBtn2').disabled = false;
+}
+
+// ====== QUIZ 3 ======
+function answerQuiz3(answer) {
+  if (answered.q3) return;
+  answered.q3 = true;
+
+  const btns = document.querySelectorAll('#quiz3 .quiz-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('feedback3');
+  if (answer === '40') {
+    btns[1].classList.add('correct');
+    fb.className = 'feedback show success';
+    fb.innerHTML = '✅ <strong>Bravo !</strong> Les 500 premiers euros sont exonérés. Le travailleur ne sera imposé que sur le surplus, soit 540 € - 500 € = <strong>40 €</strong>. Seuls ces 40 € seront ajoutés à sa base imposable.';
+    addScore(10);
+  } else {
+    if (answer === '540') btns[0].classList.add('wrong');
+    else btns[2].classList.add('wrong');
+    btns[1].classList.add('correct');
+    fb.className = 'feedback show error';
+    fb.innerHTML = '❌ <strong>Pas tout à fait.</strong> L\'exonération pour 2026 est de 500 €/an. Sur les 540 € reçus, les 500 premiers sont exonérés. Seuls <strong>40 €</strong> (540 - 500) seront imposés. La bonne réponse était B.';
+  }
+  document.getElementById('nextBtn3').disabled = false;
+}
+
+// ====== QUIZ 4 ======
+function answerQuiz4(answer) {
+  if (answered.q4) return;
+  answered.q4 = true;
+
+  const btns = document.querySelectorAll('#quiz4 .quiz-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('feedback4');
+  if (answer === 'net') {
+    btns[1].classList.add('correct');
+    fb.className = 'feedback show success';
+    fb.innerHTML = '✅ <strong>Excellent !</strong> L\'employeur dépense le même montant, mais le travailleur reçoit davantage en net. C\'est donc un outil de <strong>fidélisation et de satisfaction</strong> du personnel, tout en optimisant les coûts salariaux.';
+    addScore(10);
+  } else {
+    if (answer === 'cost') btns[0].classList.add('wrong');
+    else btns[2].classList.add('wrong');
+    btns[1].classList.add('correct');
+    fb.className = 'feedback show error';
+    fb.innerHTML = '❌ <strong>Pas exactement.</strong> Le coût pour l\'employeur est similaire, mais l\'avantage réside dans le fait que le travailleur reçoit <strong>plus en net</strong> pour le même montant investi. C\'est un outil d\'optimisation, pas une obligation (sauf CCT). La bonne réponse était B.';
+  }
+  document.getElementById('nextBtn4').disabled = false;
+}
+
+// ====== QUIZ 5 ======
+function answerQuiz5(answer) {
+  if (answered.q5) return;
+  answered.q5 = true;
+
+  const btns = document.querySelectorAll('#quiz5 .quiz-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('feedback5');
+  if (answer === 'no') {
+    btns[0].classList.add('correct');
+    fb.className = 'feedback show success';
+    fb.innerHTML = '✅ <strong>Parfait !</strong> Il n\'existe pas d\'obligation légale générale pour la voiture privée. L\'obligation ne peut venir que d\'une CCT sectorielle ou du contrat de travail. Par contre, pour les transports en commun et le vélo, l\'obligation existe bel et bien.';
+    addScore(10);
+  } else {
+    btns[1].classList.add('wrong');
+    btns[0].classList.add('correct');
+    fb.className = 'feedback show error';
+    fb.innerHTML = '❌ <strong>Attention !</strong> L\'employeur n\'est pas toujours obligé d\'intervenir. Pour la voiture privée, il n\'y a <strong>pas d\'obligation générale</strong>. Cela dépend de la CCT sectorielle ou du contrat de travail. La bonne réponse était A.';
+  }
+  document.getElementById('nextBtn5').disabled = false;
+}
+
+// ====== SIMULATOR ======
+function updateSimulator() {
+  const monthly = parseInt(document.getElementById('simSlider').value);
+  document.getElementById('sliderValue').textContent = monthly;
+
+  const yearly = monthly * 12;
+  const exemption = 500;
+  const taxable = Math.max(0, yearly - exemption);
+  const netFromIndemnity = yearly - (taxable * 0.5); // simplified
+  const grossEquiv = yearly;
+  const csss = grossEquiv * 0.1307;
+  const afterCSS = grossEquiv - csss;
+  const tax = afterCSS * 0.4;
+  const netFromGross = afterCSS - tax;
+
+  const saving = yearly - netFromGross;
+  const isOverLimit = yearly > exemption;
+
+  const el = document.getElementById('simResult');
+  el.innerHTML = `
+    <h3>📊 Résultat de la simulation</h3>
+    <div class="sim-row">
+      <span class="sim-label">Montant annuel versé</span>
+      <span class="sim-value white">${yearly.toFixed(0)} €</span>
+    </div>
+    <div class="sim-row">
+      <span class="sim-label">Montant exonéré (max. 500 €)</span>
+      <span class="sim-value green">${Math.min(yearly, exemption).toFixed(0)} €</span>
+    </div>
+    ${isOverLimit ? `<div class="sim-row">
+      <span class="sim-label">Montant imposable (surplus)</span>
+      <span class="sim-value red">${taxable.toFixed(0)} €</span>
+    </div>` : ''}
+    <div class="sim-divider"></div>
+    <div class="sim-row">
+      <span class="sim-label"><strong>Net via indemnité déplacement</strong></span>
+      <span class="sim-value green"><strong>${(yearly - taxable * 0.5).toFixed(0)} €</strong></span>
+    </div>
+    <div class="sim-row">
+      <span class="sim-label">Net si versé en salaire brut (≈)</span>
+      <span class="sim-value red">${netFromGross.toFixed(0)} €</span>
+    </div>
+    <div class="sim-divider"></div>
+    <div class="sim-row">
+      <span class="sim-label">💰 <strong>Gain net pour le travailleur</strong></span>
+      <span class="sim-value gold"><strong>+ ${(yearly - taxable * 0.5 - netFromGross).toFixed(0)} €</strong></span>
+    </div>
+    ${isOverLimit ? `<div style="margin-top:12px;padding:10px;background:rgba(255,107,107,0.08);border-radius:8px;font-size:0.85rem;color:var(--accent3);">
+      ⚠️ Attention : le montant dépasse les 500 € d'exonération. Le surplus de <strong>${taxable.toFixed(0)} €</strong> sera imposé. Pour une optimisation maximale, restez sous les 500 €/an (≈ 41,67 €/mois).
+    </div>` : `<div style="margin-top:12px;padding:10px;background:rgba(52,211,153,0.08);border-radius:8px;font-size:0.85rem;color:var(--green);">
+      ✅ Le montant reste sous le plafond de 500 €. L'intégralité est versée en <strong>net pur</strong> au travailleur !
+    </div>`}
+  `;
+}
+
+// ====== CONFETTI ======
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const particles = [];
+  const colors = ['#4f8cff', '#7c5cfc', '#ff6b6b', '#34d399', '#fbbf24', '#fff'];
+
+  for (let i = 0; i < 120; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 200,
+      w: 6 + Math.random() * 6,
+      h: 4 + Math.random() * 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 4,
+      vy: 2 + Math.random() * 4,
+      rot: Math.random() * 360,
+      rotV: (Math.random() - 0.5) * 10,
+      opacity: 1
+    });
+  }
+
+  let frame = 0;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    frame++;
+    let alive = false;
+
+    particles.forEach(p => {
+      if (p.opacity <= 0) return;
+      alive = true;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05;
+      p.rot += p.rotV;
+      if (frame > 80) p.opacity -= 0.015;
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+
+    if (alive) requestAnimationFrame(animate);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  animate();
+}
+
+// ====== RESTART ======
+function restartApp() {
+  score = 0;
+  document.getElementById('scoreText').textContent = '0 pts';
+  Object.keys(answered).forEach(k => delete answered[k]);
+
+  // Reset quiz buttons
+  document.querySelectorAll('.quiz-btn').forEach(b => {
+    b.disabled = false;
+    b.classList.remove('correct', 'wrong');
+  });
+  document.querySelectorAll('.feedback').forEach(f => {
+    f.classList.remove('show');
+    f.innerHTML = '';
+  });
+
+  // Disable next buttons
+  for (let i = 1; i <= 5; i++) {
+    const btn = document.getElementById(`nextBtn${i}`);
+    if (btn) btn.disabled = true;
+  }
+
+  goToStep(1);
+}
+
+// ====== START ======
+init();
+</script>
+
+</body>
+</html>
